@@ -1,0 +1,11 @@
+﻿@CryptoExchangeApi_HostAddress = http://localhost:5022
+
+GET {{CryptoExchangeApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+POST {{CryptoExchangeApi_HostAddress}}/api/bitcoin/buy
+Content-Type: application/json
+{
+	"amount": 3.0
+}

@@ -1,0 +1,68 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="SeedData\exchange-01.json" />
+    <None Remove="SeedData\exchange-02.json" />
+    <None Remove="SeedData\exchange-03.json" />
+    <None Remove="SeedData\exchange-04.json" />
+    <None Remove="SeedData\exchange-05.json" />
+    <None Remove="SeedData\exchange-06.json" />
+    <None Remove="SeedData\exchange-07.json" />
+    <None Remove="SeedData\exchange-08.json" />
+    <None Remove="SeedData\exchange-09.json" />
+    <None Remove="SeedData\exchange-10.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="SeedData\exchange-01.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SeedData\exchange-02.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SeedData\exchange-03.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SeedData\exchange-04.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SeedData\exchange-05.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SeedData\exchange-06.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SeedData\exchange-07.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SeedData\exchange-08.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SeedData\exchange-09.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SeedData\exchange-10.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CryptoExchange.Common\CryptoExchange.Common.csproj" />
+    <ProjectReference Include="..\CryptoExchange.Contracts\CryptoExchange.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
