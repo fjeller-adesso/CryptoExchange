@@ -44,9 +44,16 @@ connection string pointing to your PostgreSQL-instance/database.
 }
 ```
 
-This is especially important since the appliaction will not run without a database.
+This is especially important since the application will not run without a database.
 
 The files necessary to seed the database will be included in the docker-container, therefore the database should be properly seeded.
+
+To create the docker container, execute the following command:
+
+```bash
+# From the solution root directory
+docker build -f CryptoExchangeApi/Dockerfile -t cryptoexchange-api .
+```
 
 ## Testing the application
 Testing can be done in visual studio using the file `CryptoExchangeApi.http` in the root of the Project `CryptoExchangeApi`. 
@@ -59,7 +66,7 @@ order will be removed from the database.
 `POST /api/bitcoin/sell`: Calls the selling endpoint. Needs an object of type `SellRequest`. The object has only one property with the 
 name "Amount", which expects a decimal value. So in the .http-file, the call would look like this:
 
-```
+```bash
 @CryptoExchangeApi_HostAddress = http://localhost:5022
 
 POST {{CryptoExchangeApi_HostAddress}}/api/bitcoin/sell
@@ -74,7 +81,7 @@ Content-Type: application/json
 `POST /api/bitcoin/buy`: Calls the buying endpoint. Needs an object of type `BuyRequest`. The object has only one property with the 
 name "Amount", which expects a decimal value. So in the .http-file, the call would look like this:
 
-```
+```bash
 @CryptoExchangeApi_HostAddress = http://localhost:5022
 
 POST {{CryptoExchangeApi_HostAddress}}/api/bitcoin/buy
@@ -89,7 +96,7 @@ Content-Type: application/json
 `POST /api/reset`: Clears the database and re-seeds the original values, since those will be changed by the transactions. This call requires
 no object, it's just a simple post-call.
 
-```
+```bash
 @CryptoExchangeApi_HostAddress = http://localhost:5022
 
 POST {{CryptoExchangeApi_HostAddress}}/api/reset
@@ -178,6 +185,9 @@ The console application uses the same functionality as the API and allows you to
 While the data will still be updated in the database, the console application will exit after each call. You can
 still reset the database though by using the command line argument `--reset` or `reset`.
 
+**Attention**: The console application needs a properly created database. It will NOT create the tables, and will only
+clear and re-seed them using the `reset` command!
+
 ### Usage
 
 Run the application from the command line with the following commands. The commands are shown as `dotnet run`-commands, which
@@ -185,7 +195,7 @@ allows you to run the application directly from the source code. If you use the 
 you will need to replace `dotnet run` with the application name, in this case `cryptoexchangeconsole`.
 
 #### Reset Database
-Re-initializes the database with the original exchange data:
+Re-seeds the database with the original exchange data:
 ```bash
 dotnet run reset
 ```
