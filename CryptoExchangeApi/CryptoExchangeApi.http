@@ -9,3 +9,7 @@ Content-Type: application/json
 {
 	"amount": 3.0
 }
+
+###
+POST {{CryptoExchangeApi_HostAddress}}/api/reset
+Accept: application/json

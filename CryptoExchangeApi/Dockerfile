@@ -1,4 +1,4 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+﻿# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
@@ -7,14 +7,27 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
+# Environment when running in docker -> production
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Production
 
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# Copy all project files
 COPY ["CryptoExchangeApi/CryptoExchangeApi.csproj", "CryptoExchangeApi/"]
+COPY ["CryptoExchange.Contracts/CryptoExchange.Contracts.csproj", "CryptoExchange.Contracts/"]
+COPY ["CryptoExchange.Core/CryptoExchange.Core.csproj", "CryptoExchange.Core/"]
+COPY ["CryptoExchange.Data.PostgreSql/CryptoExchange.Data.PostgreSql.csproj", "CryptoExchange.Data.PostgreSql/"]
+COPY ["CryptoExchange.Net9.ServiceDefaults/CryptoExchange.Net9.ServiceDefaults.csproj", "CryptoExchange.Net9.ServiceDefaults/"]
+COPY ["CryptoExchange.Common/CryptoExchange.Common.csproj", "CryptoExchange.Common/"]
+
 RUN dotnet restore "./CryptoExchangeApi/CryptoExchangeApi.csproj"
+
 COPY . .
+
 WORKDIR "/src/CryptoExchangeApi"
 RUN dotnet build "./CryptoExchangeApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
 

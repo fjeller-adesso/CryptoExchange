@@ -1,4 +1,5 @@
 ﻿using CryptoExchange.Contracts.Models;
+using CryptoExchange.Contracts.Seeding;
 using CryptoExchange.Contracts.Services;
 
 namespace CryptoExchangeApi.Extensions;
@@ -16,7 +17,7 @@ public static class EndpointMappings
 
 				SellResult result = await bitcoinService.SellAsync( request.Amount );
 
-				if ( result.SuccessfullySold )
+				if ( result.IsSuccessful )
 				{
 					return Results.Ok( result );
 				}
@@ -37,7 +38,7 @@ public static class EndpointMappings
 
 				BuyResult result = await bitcoinService.BuyAsync( request.Amount );
 
-				if ( result.SuccessfullyPurchased )
+				if ( result.IsSuccessful )
 				{
 					return Results.Ok( result );
 				}
@@ -47,6 +48,17 @@ public static class EndpointMappings
 			.WithName( "BuyBitcoin" )
 			.WithSummary( "Buy Bitcoin" )
 			.WithDescription( "Executes optimal buy orders across exchanges to purchase the specified amount of Bitcoin" )
+			.WithOpenApi();
+
+		app.MapPost( "/api/reset", async ( IResetDatabaseService resetDatabaseService ) =>
+		{
+			ResetResult result = await resetDatabaseService.ResetDatabaseAsync();
+
+			return Results.Ok( result );
+		} )
+			.WithName( "ResetDatabase" )
+			.WithSummary( "Reset the database" )
+			.WithDescription( "Reset the database by clearing all entries and seeding it with the original data." )
 			.WithOpenApi();
 	}
 }

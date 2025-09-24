@@ -2,6 +2,7 @@
 using CryptoExchange.Contracts.Models;
 using CryptoExchange.Contracts.Repositories;
 using CryptoExchange.Contracts.Services;
+using CryptoExchange.Core.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace CryptoExchange.Core.Services;
@@ -35,7 +36,7 @@ public class BitcoinOrderService : IBitcoinOrderService
 
 		// Remark: The fact that the exchange data is loaded at the begin of the transactions and saved after is not optimal,
 		// however due to limited time I decided that for a test application this is good enough.
-		var workingOrders = ( await _cryptoRepository.GetOrderedWorkingBuyOrdersAsync() ).ToList();
+		List<WorkingBuyOrder> workingOrders = ( await _cryptoRepository.GetOrderedWorkingBuyOrdersAsync() ).ToList();
 
 		var executedOrders = new List<OrderExecution>();
 		decimal remainingToBuy = bitcoinAmountToBuy;
@@ -70,6 +71,7 @@ public class BitcoinOrderService : IBitcoinOrderService
 				{
 					Order = workingOrder.OriginalOrder,
 					ExchangeId = workingOrder.ExchangeId,
+					ExchangeName = workingOrder.ExchangeName,
 					AmountToBuy = amountFromThisOrder,
 					TotalCost = costFromThisOrder
 				} );
@@ -107,10 +109,10 @@ public class BitcoinOrderService : IBitcoinOrderService
 
 		return new BuyResult
 		{
-			ExecutedOrders = executedOrders,
+			ExecutedOrders = executedOrders.Select(o=>o.MapToBuyOrderItem()).ToList(),
 			TotalBitcoinPurchased = actualBitcoinPurchased,
 			TotalCost = totalCost,
-			SuccessfullyPurchased = successfullyPurchased,
+			IsSuccessful = successfullyPurchased,
 			ErrorMessage = successfullyPurchased ? null : $"Only {actualBitcoinPurchased} Bitcoin could be purchased. Remaining needed: {remainingToBuy}"
 		};
 	}
@@ -169,6 +171,7 @@ public class BitcoinOrderService : IBitcoinOrderService
 				{
 					Order = workingOrder.OriginalOrder,
 					ExchangeId = workingOrder.ExchangeId,
+					ExchangeName = workingOrder.ExchangeName,
 					AmountToSell = amountToThisOrder,
 					TotalReceived = receivedFromThisOrder
 				} );
@@ -215,10 +218,10 @@ public class BitcoinOrderService : IBitcoinOrderService
 
 		return new SellResult
 		{
-			ExecutedOrders = executedOrders,
+			ExecutedOrders = executedOrders.Select(o=>o.MapToSellOrderItem()).ToList(),
 			TotalBitcoinSold = actualBitcoinSold,
 			TotalReceived = totalReceived,
-			SuccessfullySold = successfullySold,
+			IsSuccessful = successfullySold,
 			ErrorMessage = successfullySold ? null : $"Only {actualBitcoinSold} Bitcoin could be sold. Remaining unsold: {remainingToSell}"
 		};
 	}

@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
 			.AddDatabase( configuration )
 			.AddTransient<IDataSeeder, DataSeeder>()
 			.AddScoped<ICryptoExchangeRepository, CryptoExchangeRepository>()
+			.AddScoped<IResetDatabaseService, ResetDatabaseService>()
 			.AddScoped<IBitcoinOrderService, BitcoinOrderService>()
 			.AddOpenApi();
 
