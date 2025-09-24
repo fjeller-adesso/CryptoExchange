@@ -86,12 +86,12 @@ public class BitcoinOrderService : IBitcoinOrderService
 				workingOrder.OriginalOrder.Amount -= amountFromThisOrder;
 
 				foundOrder = true;
-				break; 
+				break;
 			}
 
 			if ( !foundOrder )
 			{
-				break; 
+				break;
 			}
 		}
 
@@ -105,7 +105,7 @@ public class BitcoinOrderService : IBitcoinOrderService
 
 		BuyResult result = new()
 		{
-			ExecutedOrders = executedOrders.Select(o=>o.MapToBuyOrderItem()).ToList(),
+			ExecutedOrders = executedOrders.Select( o => o.MapToBuyOrderItem() ).ToList(),
 			TotalBitcoinPurchased = actualBitcoinPurchased,
 			TotalCost = totalCost,
 			IsSuccessful = successfullyPurchased,
@@ -145,11 +145,11 @@ public class BitcoinOrderService : IBitcoinOrderService
 		{
 			bool foundOrder = false;
 
-			foreach (WorkingSellOrder workingOrder in workingOrders)
+			foreach ( WorkingSellOrder workingOrder in workingOrders )
 			{
 				if ( workingOrder.RemainingAmount <= 0 || workingOrder.ExchangeFunds <= 0 )
 				{
-					continue; 
+					continue;
 				}
 
 				decimal maxAmountByOrder = Math.Min( remainingToSell, workingOrder.RemainingAmount );
@@ -159,7 +159,7 @@ public class BitcoinOrderService : IBitcoinOrderService
 
 				if ( amountToThisOrder <= 0 )
 				{
-					continue; 
+					continue;
 				}
 
 				decimal receivedFromThisOrder = amountToThisOrder * workingOrder.OriginalOrder.Price;
@@ -193,12 +193,12 @@ public class BitcoinOrderService : IBitcoinOrderService
 				workingOrder.OriginalOrder.Amount -= amountToThisOrder;
 
 				foundOrder = true;
-				break; 
+				break;
 			}
 
 			if ( !foundOrder )
 			{
-				break; 
+				break;
 			}
 		}
 
@@ -212,7 +212,7 @@ public class BitcoinOrderService : IBitcoinOrderService
 
 		SellResult result = new()
 		{
-			ExecutedOrders = executedOrders.Select(o=>o.MapToSellOrderItem()).ToList(),
+			ExecutedOrders = executedOrders.Select( o => o.MapToSellOrderItem() ).ToList(),
 			TotalBitcoinSold = actualBitcoinSold,
 			TotalReceived = totalReceived,
 			IsSuccessful = successfullySold,
@@ -222,13 +222,9 @@ public class BitcoinOrderService : IBitcoinOrderService
 		return result;
 	}
 
-	public async Task<BuyResult> BuyAsync(decimal bitcoinAmountToBuy )
-	{
-		return await FindOptimalBuyOrdersAsync( bitcoinAmountToBuy );
-	}
+	/// <inheritdoc />
+	public async Task<BuyResult> BuyAsync( decimal bitcoinAmountToBuy ) => await FindOptimalBuyOrdersAsync( bitcoinAmountToBuy );
 
-	public async Task<SellResult> SellAsync(decimal bitCoinAmountToSell )
-	{
-		return await FindOptimalSellOrdersAsync( bitCoinAmountToSell );
-	}
+	/// <inheritdoc />
+	public async Task<SellResult> SellAsync( decimal bitCoinAmountToSell ) => await FindOptimalSellOrdersAsync( bitCoinAmountToSell );
 }

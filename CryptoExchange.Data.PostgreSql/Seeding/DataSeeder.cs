@@ -21,6 +21,12 @@ public class DataSeeder : IDataSeeder
 		_logger = logger;
 	}
 
+	/// <summary>
+	/// Loads a single json file to seed the data into the database, returns a <see cref="CoinExchange"/> object
+	/// or null if the file cannot be loaded.
+	/// </summary>
+	/// <param name="fileName">The name of the file to load</param>
+	/// <returns>A <see cref="CoinExchange"/> object or null if the file cannot be loaded.</returns>
 	private CoinExchange? LoadSingleSeedFile( string? fileName )
 	{
 		if ( fileName == null || !File.Exists( fileName ) )
@@ -50,6 +56,10 @@ public class DataSeeder : IDataSeeder
 		}
 	}
 
+	/// <summary>
+	/// Loads the data to seed the database
+	/// </summary>
+	/// <returns>A <see cref="List{CoinExchange}"/> with the objects to insert into the database</returns>
 	private List<CoinExchange> LoadSeedingData()
 	{
 		string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -68,6 +78,10 @@ public class DataSeeder : IDataSeeder
 		return result;
 	}
 
+	/// <summary>
+	/// Inserts a <see cref="CoinExchange"/> object into the database
+	/// </summary>
+	/// <param name="exchange">The <see cref="CoinExchange"/> instance to insert into the database</param>
 	private void InsertCoinExchange( CoinExchange exchange )
 	{
 		try
@@ -90,6 +104,7 @@ public class DataSeeder : IDataSeeder
 		}
 	}
 
+	/// <inheritdoc />
 	public SeedResult SeedDatabase()
 	{
 		if ( _dataContext.ExchangeEntities.Any() )

@@ -22,6 +22,8 @@ public class CryptoExchangeRepository : ICryptoExchangeRepository
 		_logger = logger;
 	}
 
+
+	/// <inheritdoc />
 	public async Task<IEnumerable<CoinExchange>> GetExchangesAsync()
 	{
 		try
@@ -42,6 +44,7 @@ public class CryptoExchangeRepository : ICryptoExchangeRepository
 		}
 	}
 
+	/// <inheritdoc />
 	public async Task<IEnumerable<WorkingBuyOrder>> GetOrderedWorkingBuyOrdersAsync()
 	{
 		List<ExchangeOrderEntity> orders = await _dataContext.ExchangeOrderEntities
@@ -55,6 +58,7 @@ public class CryptoExchangeRepository : ICryptoExchangeRepository
 		return result;
 	}
 
+	/// <inheritdoc />
 	public async Task<IEnumerable<WorkingSellOrder>> GetOrderedWorkingSellOrdersAsync()
 	{
 		List<ExchangeOrderEntity> orders = await _dataContext.ExchangeOrderEntities
@@ -68,6 +72,7 @@ public class CryptoExchangeRepository : ICryptoExchangeRepository
 		return result;
 	}
 
+	/// <inheritdoc />
 	public async Task UpdateAvailableCryptoAsync( Dictionary<Guid, decimal> cryptoPerExchangeId )
 	{
 		foreach ( var (exchangeId, cryptoUsed) in cryptoPerExchangeId )
@@ -82,6 +87,7 @@ public class CryptoExchangeRepository : ICryptoExchangeRepository
 		await _dataContext.SaveChangesAsync();
 	}
 
+	/// <inheritdoc />
 	public async Task UpdateAvailableFundsAsync( Dictionary<Guid, (decimal CryptoGained, decimal EuroSpent)> exchangeUpdates )
 	{
 		foreach ( var (exchangeId, updates) in exchangeUpdates )
@@ -97,6 +103,7 @@ public class CryptoExchangeRepository : ICryptoExchangeRepository
 		}
 	}
 
+	/// <inheritdoc />
 	public async Task UpdateFulfilledWorkOrdersAsync( IEnumerable<CoinExchangeOrder> orders )
 	{
 		try
@@ -126,6 +133,7 @@ public class CryptoExchangeRepository : ICryptoExchangeRepository
 		}
 	}
 
+	/// <inheritdoc />
 	public async Task<bool> UpdateExchangeAsync( CoinExchange exchange )
 	{
 		try
@@ -151,6 +159,7 @@ public class CryptoExchangeRepository : ICryptoExchangeRepository
 		}
 	}
 
+	/// <inheritdoc />
 	public async Task<bool> ClearDatabaseAsync()
 	{
 		try

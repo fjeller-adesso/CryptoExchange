@@ -6,8 +6,8 @@ namespace CryptoExchange.Data.PostgreSql.Extensions;
 
 internal static class MappingExtensions
 {
-	private const string _TYPENAME_BID = "buy";
-	private const string _TYPENAME_ASK = "sell";
+	private const string _TYPENAME_BID = "Buy";
+	private const string _TYPENAME_ASK = "Sell";
 
 	public static CoinExchangeOrder MapToCoinExchangeOrder( this Order order )
 	{
@@ -42,7 +42,7 @@ internal static class MappingExtensions
 		return result;
 	}
 
-	public static WorkingBuyOrder MapToWorkingBuyOrder(this ExchangeOrderEntity entity )
+	public static WorkingBuyOrder MapToWorkingBuyOrder( this ExchangeOrderEntity entity )
 	{
 		WorkingBuyOrder result = new()
 		{
@@ -56,7 +56,7 @@ internal static class MappingExtensions
 		return result;
 	}
 
-	public static WorkingSellOrder MapToWorkingSellOrder(this ExchangeOrderEntity entity )
+	public static WorkingSellOrder MapToWorkingSellOrder( this ExchangeOrderEntity entity )
 	{
 		WorkingSellOrder result = new()
 		{
@@ -86,7 +86,7 @@ internal static class MappingExtensions
 		return result;
 	}
 
-	public static void UpdateEntity(this ExchangeEntity exchange, CoinExchange data )
+	public static void UpdateEntity( this ExchangeEntity exchange, CoinExchange data )
 	{
 		exchange.AvailableCrypto = data.AvailableCrypto;
 		exchange.AvailableEuro = data.AvailableEuro;

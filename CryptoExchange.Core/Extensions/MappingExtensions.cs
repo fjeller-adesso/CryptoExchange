@@ -5,7 +5,7 @@ namespace CryptoExchange.Core.Extensions;
 
 internal static class MappingExtensions
 {
-	public static BuyOrderItem MapToBuyOrderItem(this OrderExecution buyOrder )
+	public static BuyOrderItem MapToBuyOrderItem( this OrderExecution buyOrder )
 	{
 		BuyOrderItem result = new()
 		{
@@ -20,7 +20,7 @@ internal static class MappingExtensions
 		return result;
 	}
 
-	public static SellOrderItem MapToSellOrderItem(this SellExecution sellOrder )
+	public static SellOrderItem MapToSellOrderItem( this SellExecution sellOrder )
 	{
 		SellOrderItem result = new()
 		{

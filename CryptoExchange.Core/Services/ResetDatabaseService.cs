@@ -11,7 +11,7 @@ public class ResetDatabaseService : IResetDatabaseService
 	private readonly ICryptoExchangeRepository _cryptoRepository;
 	private readonly IDataSeeder _dataSeeder;
 
-	public ResetDatabaseService(ICryptoExchangeRepository cryptoRepository, IDataSeeder dataSeeder)
+	public ResetDatabaseService( ICryptoExchangeRepository cryptoRepository, IDataSeeder dataSeeder )
 	{
 		_cryptoRepository = cryptoRepository;
 		_dataSeeder = dataSeeder;
@@ -22,13 +22,13 @@ public class ResetDatabaseService : IResetDatabaseService
 		bool databaseCleared = await _cryptoRepository.ClearDatabaseAsync();
 		if ( !databaseCleared )
 		{
-			return ResetResult.Error("The database could not be cleared and was not re-seeded");
+			return ResetResult.Error( "The database could not be cleared and was not re-seeded" );
 		}
 
 		SeedResult seedResult = _dataSeeder.SeedDatabase();
 
-		ResetResult result = seedResult == SeedResult.DataSeeded 
-			? ResetResult.Success( "The database was re-seeded" ) 
+		ResetResult result = seedResult == SeedResult.DataSeeded
+			? ResetResult.Success( "The database was re-seeded" )
 			: ResetResult.Error( "The database could not be seeded, please check the logs." );
 
 		return result;
