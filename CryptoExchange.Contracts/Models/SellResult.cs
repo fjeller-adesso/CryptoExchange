@@ -1,6 +1,4 @@
-﻿using CryptoExchange.Contracts.DataObjects;
-
-namespace CryptoExchange.Contracts.Models;
+﻿namespace CryptoExchange.Contracts.Models;
 
 public class SellResult
 {

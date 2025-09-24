@@ -1,5 +1,4 @@
 ﻿using CryptoExchange.Contracts.Models;
-using CryptoExchange.Contracts.Seeding;
 using CryptoExchange.Contracts.Services;
 
 namespace CryptoExchangeApi.Extensions;

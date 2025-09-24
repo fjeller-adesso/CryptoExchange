@@ -173,3 +173,43 @@ Here is a sample of a result when buying 3 BC with a freshly seeded database:
 }
 ```
 
+## Console Application
+The console application uses the same functionality as the API and allows you to buy/sell bitcoin from the commadn line.
+While the data will still be updated in the database, the console application will exit after each call. You can
+still reset the database though by using the command line argument `--reset` or `reset`.
+
+### Usage
+
+Run the application from the command line with the following commands. The commands are shown as `dotnet run`-commands, which
+allows you to run the application directly from the source code. If you use the final, compiled version of the application,
+you will need to replace `dotnet run` with the application name, in this case `cryptoexchangeconsole`.
+
+#### Reset Database
+Re-initializes the database with the original exchange data:
+```bash
+dotnet run reset
+```
+
+#### Buy Bitcoin
+Purchase Bitcoin using optimal buy orders across exchanges:
+```bash
+dotnet run buy --amount 1.5
+dotnet run buy -a 1.5
+```
+
+#### Sell Bitcoin
+Sell Bitcoin using optimal sell orders across exchanges:
+```bash
+dotnet run sell --amount 0.75
+dotnet run sell -a 0.75
+```
+
+#### Help
+Display help information:
+```bash
+dotnet run help
+dotnet run --help
+dotnet run -h
+```
+
+

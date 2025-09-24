@@ -18,7 +18,6 @@ public class BitcoinOrderService : IBitcoinOrderService
 		_logger = logger;
 	}
 
-
 	/// <summary>
 	/// Finds the optimal orders to buy the specified amount of Bitcoin for the lowest possible price
 	/// across all exchanges. Orders can be executed multiple times if they offer the best price.
@@ -48,7 +47,6 @@ public class BitcoinOrderService : IBitcoinOrderService
 		{
 			bool foundOrder = false;
 
-			// Find the cheapest order that still has remaining capacity
 			foreach ( WorkingBuyOrder workingOrder in workingOrders )
 			{
 				if ( workingOrder.RemainingAmount <= 0 || workingOrder.ExchangeCrypto <= 0 )
@@ -79,23 +77,21 @@ public class BitcoinOrderService : IBitcoinOrderService
 				remainingToBuy -= amountFromThisOrder;
 				totalCost += costFromThisOrder;
 
-				// Track exchange updates
 				exchangeUpdates.TryAdd( workingOrder.ExchangeId, 0 );
 				exchangeUpdates[workingOrder.ExchangeId] += amountFromThisOrder;
 
 				workingOrder.RemainingAmount -= amountFromThisOrder;
 				workingOrder.ExchangeCrypto -= amountFromThisOrder;
 
-				// Update the original order amount for subsequent transactions
 				workingOrder.OriginalOrder.Amount -= amountFromThisOrder;
 
 				foundOrder = true;
-				break; // Always use the cheapest available order first
+				break; 
 			}
 
 			if ( !foundOrder )
 			{
-				break; // No more orders available
+				break; 
 			}
 		}
 
@@ -107,7 +103,7 @@ public class BitcoinOrderService : IBitcoinOrderService
 		bool successfullyPurchased = remainingToBuy <= 0;
 		decimal actualBitcoinPurchased = bitcoinAmountToBuy - remainingToBuy;
 
-		return new BuyResult
+		BuyResult result = new()
 		{
 			ExecutedOrders = executedOrders.Select(o=>o.MapToBuyOrderItem()).ToList(),
 			TotalBitcoinPurchased = actualBitcoinPurchased,
@@ -115,6 +111,8 @@ public class BitcoinOrderService : IBitcoinOrderService
 			IsSuccessful = successfullyPurchased,
 			ErrorMessage = successfullyPurchased ? null : $"Only {actualBitcoinPurchased} Bitcoin could be purchased. Remaining needed: {remainingToBuy}"
 		};
+
+		return result;
 	}
 
 	/// <summary>
@@ -141,8 +139,7 @@ public class BitcoinOrderService : IBitcoinOrderService
 		decimal remainingToSell = bitcoinAmountToSell;
 		decimal totalReceived = 0;
 
-		// Track exchange updates for post-transaction application
-		var exchangeUpdates = new Dictionary<Guid, (decimal CryptoGained, decimal EuroSpent)>();
+		Dictionary<Guid, (decimal CryptoGained, decimal EuroSpent)> exchangeUpdates = new();
 
 		while ( remainingToSell > 0 )
 		{
@@ -191,20 +188,17 @@ public class BitcoinOrderService : IBitcoinOrderService
 					currentUpdate.EuroSpent + receivedFromThisOrder
 				);
 
-				// Update the working order with new remaining amounts
 				workingOrder.RemainingAmount -= amountToThisOrder;
 				workingOrder.ExchangeFunds -= receivedFromThisOrder;
-
-				// Update the original order amount for subsequent transactions
 				workingOrder.OriginalOrder.Amount -= amountToThisOrder;
 
 				foundOrder = true;
-				break; // Always use the highest-priced available order first
+				break; 
 			}
 
 			if ( !foundOrder )
 			{
-				break; // No more orders available
+				break; 
 			}
 		}
 
@@ -216,7 +210,7 @@ public class BitcoinOrderService : IBitcoinOrderService
 		bool successfullySold = remainingToSell <= 0;
 		decimal actualBitcoinSold = bitcoinAmountToSell - remainingToSell;
 
-		return new SellResult
+		SellResult result = new()
 		{
 			ExecutedOrders = executedOrders.Select(o=>o.MapToSellOrderItem()).ToList(),
 			TotalBitcoinSold = actualBitcoinSold,
@@ -224,6 +218,8 @@ public class BitcoinOrderService : IBitcoinOrderService
 			IsSuccessful = successfullySold,
 			ErrorMessage = successfullySold ? null : $"Only {actualBitcoinSold} Bitcoin could be sold. Remaining unsold: {remainingToSell}"
 		};
+
+		return result;
 	}
 
 	public async Task<BuyResult> BuyAsync(decimal bitcoinAmountToBuy )

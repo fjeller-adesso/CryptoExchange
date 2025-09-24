@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CryptoExchange.Contracts.Models;
+﻿using CryptoExchange.Contracts.Models;
 using CryptoExchange.Contracts.Repositories;
 using CryptoExchange.Contracts.Results;
 using CryptoExchange.Contracts.Seeding;
