@@ -33,7 +33,7 @@ public static class WebApplicationBuilderExtensions
 		return app;
 	}
 
-	public static void Start(this WebApplicationBuilder builder )
+	public static void Start( this WebApplicationBuilder builder )
 	{
 		builder
 			.AddServiceDefaults()

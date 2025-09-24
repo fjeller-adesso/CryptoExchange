@@ -10,15 +10,16 @@ internal class ConsoleService : IConsoleService
 	private readonly IResetDatabaseService _resetDatabaseService;
 
 	private readonly ILogger<ConsoleService> _logger;
-	
 
-	public ConsoleService(IBitcoinOrderService bitcoinOrderService, IResetDatabaseService resetDatabaseService, ILogger<ConsoleService> logger)
+
+	public ConsoleService( IBitcoinOrderService bitcoinOrderService, IResetDatabaseService resetDatabaseService, ILogger<ConsoleService> logger )
 	{
 		_bitcoinOrderService = bitcoinOrderService;
 		_resetDatabaseService = resetDatabaseService;
 		_logger = logger;
 	}
 
+	/// <inheritdoc />
 	public async Task ExecuteBuyOrderAsync( decimal amount )
 	{
 		try
@@ -32,7 +33,7 @@ internal class ConsoleService : IConsoleService
 				return;
 			}
 
-			var result = await _bitcoinOrderService.BuyAsync( amount );
+			BuyResult result = await _bitcoinOrderService.BuyAsync( amount );
 
 			if ( result.IsSuccessful )
 			{
@@ -45,10 +46,10 @@ internal class ConsoleService : IConsoleService
 				if ( result.ExecutedOrders.Any() )
 				{
 					Console.WriteLine( "Executed Orders:" );
-					foreach ( var order in result.ExecutedOrders )
+					foreach ( BuyOrderItem order in result.ExecutedOrders )
 					{
 						Console.WriteLine( $"    Exchange ID:   {order.ExchangeId}" );
-						Console.WriteLine( $"    Exchange Name: {order.ExchangeName}");
+						Console.WriteLine( $"    Exchange Name: {order.ExchangeName}" );
 						Console.WriteLine( $"    Amount:        {order.AmountToBuy:F8} BTC" );
 						Console.WriteLine( $"    Price:         {order.Price:F2} EUR" );
 						Console.WriteLine( $"    Cost:          {order.TotalCost:F2} EUR" );
@@ -74,6 +75,7 @@ internal class ConsoleService : IConsoleService
 		}
 	}
 
+	/// <inheritdoc />
 	public async Task ExecuteSellOrderAsync( decimal amount )
 	{
 		try
@@ -100,7 +102,7 @@ internal class ConsoleService : IConsoleService
 				if ( result.ExecutedOrders.Any() )
 				{
 					Console.WriteLine( "Executed Orders:" );
-					foreach ( var order in result.ExecutedOrders )
+					foreach ( SellOrderItem order in result.ExecutedOrders )
 					{
 						Console.WriteLine( $"    Exchange ID:   {order.ExchangeId}" );
 						Console.WriteLine( $"    Exchange Name: {order.ExchangeName}" );
@@ -129,11 +131,12 @@ internal class ConsoleService : IConsoleService
 		}
 	}
 
+	/// <inheritdoc />
 	public async Task ResetDatabaseAsync()
 	{
 		try
 		{
-			Console.WriteLine( $"Attempting to reset the database and seed it with original data ..." );
+			Console.WriteLine( "Attempting to reset the database and seed it with original data ..." );
 			Console.WriteLine();
 
 			ResetResult result = await _resetDatabaseService.ResetDatabaseAsync();

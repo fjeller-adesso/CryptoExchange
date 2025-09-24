@@ -38,7 +38,7 @@ public static class WebApplicationExtensions
 		return app;
 	}
 
-	public static IApplicationBuilder SeedDatabase(this IApplicationBuilder app )
+	public static IApplicationBuilder SeedDatabase( this IApplicationBuilder app )
 	{
 		using IServiceScope scope = ( (WebApplication)app ).Services.CreateScope();
 
@@ -47,9 +47,9 @@ public static class WebApplicationExtensions
 
 		logger.LogInformation( "Seeding data if needed ..." );
 
-		var result = seeder.SeedDatabase();
+		SeedResult result = seeder.SeedDatabase();
 
-		switch (result)
+		switch ( result )
 		{
 			case SeedResult.DataAlreadyExists:
 				logger.LogInformation( "The database entries already exist, no seeding necessary" );
@@ -69,7 +69,7 @@ public static class WebApplicationExtensions
 
 	}
 
-	public static IApplicationBuilder ConfigurePipeline(this WebApplication app, IConfiguration configuration, IWebHostEnvironment environment )
+	public static IApplicationBuilder ConfigurePipeline( this WebApplication app, IConfiguration configuration, IWebHostEnvironment environment )
 	{
 		if ( environment.IsDevelopment() )
 		{

@@ -14,7 +14,7 @@ namespace CryptoExchangeConsole.Extensions;
 
 internal static class ServiceCollectionExtensions
 {
-	private static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration )
+	private static IServiceCollection ConfigureDatabase( this IServiceCollection services, IConfiguration configuration )
 	{
 		string? connectionString = configuration.GetConnectionString( "cryptoexchange" );
 		if ( connectionString == null )
@@ -27,10 +27,10 @@ internal static class ServiceCollectionExtensions
 		return services;
 	}
 
-	public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration )
+	public static void ConfigureServices( this IServiceCollection services, IConfiguration configuration )
 	{
 		services
-			.ConfigureDatabase(configuration)
+			.ConfigureDatabase( configuration )
 			.AddTransient<IDataSeeder, DataSeeder>()
 			.AddScoped<ICryptoExchangeRepository, CryptoExchangeRepository>()
 			.AddScoped<IResetDatabaseService, ResetDatabaseService>()
