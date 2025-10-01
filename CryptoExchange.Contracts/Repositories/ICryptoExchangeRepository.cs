@@ -23,26 +23,24 @@ public interface ICryptoExchangeRepository
 	Task<IEnumerable<WorkingSellOrder>> GetOrderedWorkingSellOrdersAsync();
 
 	/// <summary>
-	/// Updates the available Cryptos for the exchanges
+	/// Updates both available funds and fulfilled orders within a single transaction
 	/// </summary>
-	/// <param name="cryptoPerExchangeId">a dictionary with exchange ids and the new crypto value for the exchange</param>
+	/// <param name="exchangeUpdates">Dictionary of exchange updates</param>
+	/// <param name="ordersToUpdate">Orders to update or delete</param>
 	/// <returns>void</returns>
-	Task UpdateAvailableCryptoAsync( Dictionary<Guid, decimal> cryptoPerExchangeId );
+	Task UpdateFundsAndOrdersAsync(
+		Dictionary<Guid, (decimal CryptoGained, decimal EuroSpent)> exchangeUpdates,
+		IEnumerable<CoinExchangeOrder> ordersToUpdate );
 
 	/// <summary>
-	/// Updates the available Funds for the exchanges
+	/// Updates both available crypto and fulfilled orders within a single transaction
 	/// </summary>
-	/// <param name="exchangeUpdates">a dictionary with exchange ids and the new funds for the exchange</param>
+	/// <param name="cryptoUpdates">Dictionary of crypto updates per exchange</param>
+	/// <param name="ordersToUpdate">Orders to update or delete</param>
 	/// <returns>void</returns>
-	Task UpdateAvailableFundsAsync( Dictionary<Guid, (decimal CryptoGained, decimal EuroSpent)> exchangeUpdates );
-
-	/// <summary>
-	/// Updates the orders that were used in the last request and deletes those who were depleted (have 0 
-	/// bitcoin remaining). This is to update the orders correctly for the next run.
-	/// </summary>
-	/// <param name="orders">the orders to update or delete</param>
-	/// <returns>void</returns>
-	Task UpdateFulfilledWorkOrdersAsync( IEnumerable<CoinExchangeOrder> orders );
+	Task UpdateCryptoAndOrdersAsync(
+		Dictionary<Guid, decimal> cryptoUpdates,
+		IEnumerable<CoinExchangeOrder> ordersToUpdate );
 
 	/// <summary>
 	/// Updates the data of a (changed) <see cref="CoinExchange"/> in the database.

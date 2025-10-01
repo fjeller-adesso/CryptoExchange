@@ -95,10 +95,9 @@ public class BitcoinOrderService : IBitcoinOrderService
 			}
 		}
 
-		await _cryptoRepository.UpdateAvailableCryptoAsync( exchangeUpdates );
-
 		IEnumerable<CoinExchangeOrder> ordersToUpdate = executedOrders.Select( o => o.Order );
-		await _cryptoRepository.UpdateFulfilledWorkOrdersAsync( ordersToUpdate );
+
+		await _cryptoRepository.UpdateCryptoAndOrdersAsync( exchangeUpdates, ordersToUpdate );
 
 		bool successfullyPurchased = remainingToBuy <= 0;
 		decimal actualBitcoinPurchased = bitcoinAmountToBuy - remainingToBuy;
@@ -202,10 +201,9 @@ public class BitcoinOrderService : IBitcoinOrderService
 			}
 		}
 
-		await _cryptoRepository.UpdateAvailableFundsAsync( exchangeUpdates );
-
 		IEnumerable<CoinExchangeOrder> ordersToUpdate = executedOrders.Select( o => o.Order );
-		await _cryptoRepository.UpdateFulfilledWorkOrdersAsync( ordersToUpdate );
+
+		await _cryptoRepository.UpdateFundsAndOrdersAsync( exchangeUpdates, ordersToUpdate );
 
 		bool successfullySold = remainingToSell <= 0;
 		decimal actualBitcoinSold = bitcoinAmountToSell - remainingToSell;

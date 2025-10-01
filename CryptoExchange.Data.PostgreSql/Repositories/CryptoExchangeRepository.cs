@@ -22,6 +22,76 @@ public class CryptoExchangeRepository : ICryptoExchangeRepository
 		_logger = logger;
 	}
 
+	#region private methods
+
+	/// <summary>
+	/// Updates the available Cryptos for the exchanges. Is used inside a transaction and does not save the changes to the database itself.
+	/// </summary>
+	/// <param name="cryptoPerExchangeId">a dictionary with exchange ids and the new crypto value for the exchange</param>
+	/// <returns>void</returns>
+	private async Task UpdateAvailableCryptoAsync( Dictionary<Guid, decimal> cryptoPerExchangeId )
+	{
+		foreach ( var (exchangeId, cryptoUsed) in cryptoPerExchangeId )
+		{
+			var exchange = await _dataContext.ExchangeEntities.FirstOrDefaultAsync( e => e.Id == exchangeId );
+			if ( exchange != null )
+			{
+				exchange.AvailableCrypto -= cryptoUsed;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Updates the available Funds for the exchanges. Is used inside a transaction and does not save the changes to the database itself.
+	/// </summary>
+	/// <param name="exchangeUpdates">a dictionary with exchange ids and the new funds for the exchange</param>
+	/// <returns>void</returns>
+	private async Task UpdateAvailableFundsAsync( Dictionary<Guid, (decimal CryptoGained, decimal EuroSpent)> exchangeUpdates )
+	{
+		foreach ( var (exchangeId, updates) in exchangeUpdates )
+		{
+			ExchangeEntity? exchange = await _dataContext.ExchangeEntities.FirstOrDefaultAsync( e => e.Id == exchangeId );
+			if ( exchange == null )
+			{
+				continue;
+			}
+
+			exchange.AvailableCrypto += updates.CryptoGained;
+			exchange.AvailableEuro -= updates.EuroSpent;
+		}
+	}
+
+	/// <summary>
+	/// Updates the orders that were used in the last request and deletes those who were depleted (have 0 
+	/// bitcoin remaining). This is to update the orders correctly for the next run. This method 
+	/// is used inside a transaction and does not save the changes to the database itself.
+	/// </summary>
+	/// <param name="orders">the orders to update or delete</param>
+	/// <returns>void</returns>
+	private async Task UpdateFulfilledWorkOrdersAsync( IEnumerable<CoinExchangeOrder> orders )
+	{
+		foreach ( CoinExchangeOrder order in orders )
+		{
+			ExchangeOrderEntity? currentOrderEntity = await _dataContext.ExchangeOrderEntities.FirstOrDefaultAsync( o => o.Id == order.Id );
+			if ( currentOrderEntity == null )
+			{
+				continue;
+			}
+
+			if ( order.Amount <= 0m )
+			{
+				_dataContext.ExchangeOrderEntities.Remove( currentOrderEntity );
+			}
+			else
+			{
+				currentOrderEntity.Amount = order.Amount;
+			}
+		}
+	}
+
+	#endregion
+
+	#region public methods
 
 	/// <inheritdoc />
 	public async Task<IEnumerable<CoinExchange>> GetExchangesAsync()
@@ -72,64 +142,37 @@ public class CryptoExchangeRepository : ICryptoExchangeRepository
 		return result;
 	}
 
-	/// <inheritdoc />
-	public async Task UpdateAvailableCryptoAsync( Dictionary<Guid, decimal> cryptoPerExchangeId )
+	public async Task UpdateFundsAndOrdersAsync( Dictionary<Guid, (decimal CryptoGained, decimal EuroSpent)> exchangeUpdates, IEnumerable<CoinExchangeOrder> ordersToUpdate )
 	{
-		foreach ( var (exchangeId, cryptoUsed) in cryptoPerExchangeId )
-		{
-			var exchange = await _dataContext.ExchangeEntities.FirstOrDefaultAsync( e => e.Id == exchangeId );
-			if ( exchange != null )
-			{
-				exchange.AvailableCrypto -= cryptoUsed;
-			}
-		}
-
-		await _dataContext.SaveChangesAsync();
-	}
-
-	/// <inheritdoc />
-	public async Task UpdateAvailableFundsAsync( Dictionary<Guid, (decimal CryptoGained, decimal EuroSpent)> exchangeUpdates )
-	{
-		foreach ( var (exchangeId, updates) in exchangeUpdates )
-		{
-			ExchangeEntity? exchange = await _dataContext.ExchangeEntities.FirstOrDefaultAsync( e => e.Id == exchangeId );
-			if (exchange == null)
-			{
-				continue;
-			}
-
-			exchange.AvailableCrypto += updates.CryptoGained;
-			exchange.AvailableEuro -= updates.EuroSpent;
-		}
-	}
-
-	/// <inheritdoc />
-	public async Task UpdateFulfilledWorkOrdersAsync( IEnumerable<CoinExchangeOrder> orders )
-	{
+		await using var transaction = await _dataContext.Database.BeginTransactionAsync();
 		try
 		{
-			foreach ( CoinExchangeOrder order in orders )
-			{
-				ExchangeOrderEntity? currentOrderEntity = await _dataContext.ExchangeOrderEntities.FirstOrDefaultAsync( o => o.Id == order.Id );
-				if ( currentOrderEntity == null )
-				{
-					continue;
-				}
-
-				if ( order.Amount <= 0m )
-				{
-					_dataContext.ExchangeOrderEntities.Remove( currentOrderEntity );
-				}
-				else
-				{
-					currentOrderEntity.Amount = order.Amount;
-				}
-			}
+			await UpdateAvailableFundsAsync( exchangeUpdates );
+			await UpdateFulfilledWorkOrdersAsync( ordersToUpdate );
 			await _dataContext.SaveChangesAsync();
+			await transaction.CommitAsync();
 		}
 		catch ( Exception ex )
 		{
-			_logger.LogError( ex, "An error occured while updating the orders of the exchanges in {MethodName}", nameof( UpdateFulfilledWorkOrdersAsync ) );
+			await transaction.RollbackAsync();
+			_logger.LogError( ex, "An error occured while updating funds and orders in {Methodname}. The transaction was rolled back", nameof( UpdateFundsAndOrdersAsync ) );
+		}
+	}
+
+	public async Task UpdateCryptoAndOrdersAsync( Dictionary<Guid, decimal> cryptoUpdates, IEnumerable<CoinExchangeOrder> ordersToUpdate )
+	{
+		await using var transaction = await _dataContext.Database.BeginTransactionAsync();
+		try
+		{
+			await UpdateAvailableCryptoAsync( cryptoUpdates );
+			await UpdateFulfilledWorkOrdersAsync( ordersToUpdate );
+			await _dataContext.SaveChangesAsync();
+			await transaction.CommitAsync();
+		}
+		catch ( Exception ex )
+		{
+			await transaction.RollbackAsync();
+			_logger.LogError( ex, "An error occured while updating funds and orders in {Methodname}. The transaction was rolled back", nameof( UpdateFundsAndOrdersAsync ) );
 		}
 	}
 
@@ -138,7 +181,7 @@ public class CryptoExchangeRepository : ICryptoExchangeRepository
 	{
 		try
 		{
-			ExchangeEntity? currentExchange = await _dataContext.ExchangeEntities.FirstOrDefaultAsync();
+			ExchangeEntity? currentExchange = await _dataContext.ExchangeEntities.FirstOrDefaultAsync( e => e.Id == exchange.Id );
 
 			if ( currentExchange == null )
 			{
@@ -180,4 +223,6 @@ public class CryptoExchangeRepository : ICryptoExchangeRepository
 			return false;
 		}
 	}
+
+	#endregion
 }
